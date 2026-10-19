@@ -1,48 +1,51 @@
-# Purpose: Run three Notice Board replicas for student 02230141.
+# Purpose: Measure a Recreate release for student 02230141.
 # Apply: kubectl apply -f manifests/rolling/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notice-board # Required single-Deployment application name.
-  namespace: nb-02230141 # Isolates this student's application.
+  name: notice-board # Identifies the application Deployment.
+  namespace: nb-02230141 # Isolates this student's resources.
   labels:
-    app: notice-board # Supports application-wide evidence queries.
+    app: notice-board # Supports application evidence queries.
   annotations:
-    kubernetes.io/change-cause: "Task 3: deploy 02230141 version 1.0.0" # Records the baseline release.
+    kubernetes.io/change-cause: "Task 5: Recreate release 02230141 to 1.1.0" # Records this release.
 spec:
-  replicas: 3 # Required baseline replica count.
+  replicas: 3 # Required application replica count.
+  strategy:
+    type: Recreate # Removes old replicas before creating replacements.
+    rollingUpdate: null # Removes default rolling-update settings.
   selector:
     matchLabels:
-      app: notice-board # Stable selector remains unchanged across releases.
+      app: notice-board # Stable selector across application versions.
   template:
     metadata:
       labels:
-        app: notice-board # Matches the Deployment and Service selectors.
-        version: "1.0.0" # Identifies the application version for observations.
+        app: notice-board # Matches the Deployment and Services.
+        version: "1.1.0" # Identifies the new release.
     spec:
       containers:
         - name: notice-board # Identifies the application container.
-          image: notice-board:02230141-1.0.0 # Locally built student-specific baseline.
-          imagePullPolicy: Never # Prevents any attempt to pull this image from a registry.
+          image: notice-board:02230141-1.1.0 # Locally loaded new release.
+          imagePullPolicy: Never # Prevents registry pulls.
           ports:
-            - name: http # Lets Services and probes reference the port by name.
-              containerPort: 8080 # Matches the application's listening port.
+            - name: http # Named port used by Services and probes.
+              containerPort: 8080 # Application listening port.
           resources:
             requests:
-              cpu: 50m # Seven app Pods plus one monitor fit within the 1-core request quota.
-              memory: 32Mi # Leaves memory request capacity for blue/green and surge Pods.
+              cpu: 50m # Leaves request capacity for later blue/green replicas.
+              memory: 32Mi # Fits concurrent replicas within the memory quota.
             limits:
-              cpu: 100m # Seven app Pods plus one monitor fit within the 2-core limit quota.
-              memory: 64Mi # Leaves memory limit capacity for blue/green and surge Pods.
+              cpu: 100m # Leaves limit capacity for replicas and the monitor.
+              memory: 64Mi # Fits concurrent replicas within the memory quota.
           readinessProbe:
             httpGet:
-              path: /healthz # Routes traffic only after warm-up and excludes the broken release.
+              path: /healthz # Excludes warming-up or unhealthy Pods from traffic.
               port: http # Uses the named application port.
-            periodSeconds: 1 # Checks readiness frequently during the five-second warm-up.
-            failureThreshold: 1 # Removes an unhealthy Pod from ready endpoints after one failure.
+            periodSeconds: 1 # Detects readiness promptly.
+            failureThreshold: 1 # Removes readiness after one failed check.
           livenessProbe:
             httpGet:
-              path: /version # Checks responsiveness without restarting intentionally unhealthy releases.
+              path: /version # Checks responsiveness without restarting the deliberately broken release.
               port: http # Uses the named application port.
-            initialDelaySeconds: 5 # Gives the Python process time to start before liveness checks.
-            periodSeconds: 5 # Detects an unresponsive application without excessive probing.
+            initialDelaySeconds: 5 # Allows application startup before checking.
+            periodSeconds: 5 # Checks responsiveness at a modest frequency.
