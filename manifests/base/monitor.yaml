@@ -1,0 +1,57 @@
+# Purpose: Continuously measure Notice Board availability for student 02230141.
+# Apply: kubectl apply -f manifests/base/monitor.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monitor # Fixed name for the continuous measuring instrument.
+  namespace: nb-02230141 # Allows the short Service name notice-board to resolve.
+  labels:
+    app: availability-monitor # Keeps this Pod outside the application Service selectors.
+spec:
+  restartPolicy: Never # Makes a monitor failure visible rather than silently restarting it.
+  containers:
+    - name: monitor # Identifies the measuring container.
+      image: notice-board:02230141-1.0.0 # Reuses the locally loaded Alpine image and its Python runtime.
+      imagePullPolicy: Never # Prevents registry pulls.
+      resources:
+        requests:
+          cpu: 50m # Fits alongside both colours and a surge Pod within the request quota.
+          memory: 32Mi # Reserves modest memory for the HTTP monitoring loop.
+        limits:
+          cpu: 100m # Leaves CPU limit capacity for application replicas.
+          memory: 64Mi # Leaves memory limit capacity for application replicas.
+      command: ["python", "-u", "-c"] # Overrides the API command; unbuffered output preserves each measurement.
+      args: # Inline monitor source keeps its configuration declarative.
+        - |
+          import json
+          import time
+          import urllib.request
+          from datetime import datetime, timezone
+
+          url = "http://notice-board/version"
+          client = urllib.request.build_opener(
+              urllib.request.ProxyHandler({})
+          )
+
+          while True:
+              started = time.monotonic()
+              timestamp = datetime.now(timezone.utc).isoformat(
+                  timespec="milliseconds"
+              ).replace("+00:00", "Z")
+
+              try:
+                  with client.open(url, timeout=0.4) as response:
+                      body = response.read().decode("utf-8")
+                      status = "OK" if response.status == 200 else "FAIL"
+                      detail = " ".join(body.splitlines())
+              except Exception as error:
+                  status = "FAIL"
+                  detail = json.dumps({
+                      "student": "02230141",
+                      "error": str(error)
+                  })
+
+              print(timestamp, status, detail, flush=True)
+
+              elapsed = time.monotonic() - started
+              time.sleep(max(0, 0.5 - elapsed))
