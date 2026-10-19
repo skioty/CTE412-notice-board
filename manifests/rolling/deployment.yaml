@@ -1,4 +1,4 @@
-# Purpose: Measure a Recreate release for student 02230141.
+# Purpose: Measure a RollingUpdate release for student 02230141.
 # Apply: kubectl apply -f manifests/rolling/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -8,12 +8,15 @@ metadata:
   labels:
     app: notice-board # Supports application evidence queries.
   annotations:
-    kubernetes.io/change-cause: "Task 5: Reset 02230141 to 1.0.0 before rolling test" # Records baseline reset.
+    kubernetes.io/change-cause: "Task 5: RollingUpdate release 02230141 to 1.1.0" # Records this release.
 spec:
   replicas: 3 # Required application replica count.
   strategy:
-    type: Recreate # Removes old replicas before creating replacements.
-    rollingUpdate: null # Removes default rolling-update settings.
+    type: RollingUpdate # Replaces replicas gradually.
+    rollingUpdate:
+      maxUnavailable: 0 # Keeps the desired available capacity during replacement.
+      maxSurge: 1 # Allows one extra non-terminating replica during rollout.
+  minReadySeconds: 5 # Requires five seconds of readiness before counting a Pod as available.
   selector:
     matchLabels:
       app: notice-board # Stable selector across application versions.
@@ -21,22 +24,22 @@ spec:
     metadata:
       labels:
         app: notice-board # Matches the Deployment and Services.
-        version: "1.0.0" # Restore the baseline version.
+        version: "1.1.0" # Identifies the new release.
     spec:
       containers:
         - name: notice-board # Identifies the application container.
-          image: notice-board:02230141-1.0.0 # Restores the baseline image.
+          image: notice-board:02230141-1.1.0 # Locally loaded new release.
           imagePullPolicy: Never # Prevents registry pulls.
           ports:
             - name: http # Named port used by Services and probes.
               containerPort: 8080 # Application listening port.
           resources:
             requests:
-              cpu: 50m # Leaves request capacity for later blue/green replicas.
-              memory: 32Mi # Fits concurrent replicas within the memory quota.
+              cpu: 50m # Leaves capacity for blue/green and surge replicas.
+              memory: 32Mi # Fits concurrent replicas within the request quota.
             limits:
-              cpu: 100m # Leaves limit capacity for replicas and the monitor.
-              memory: 64Mi # Fits concurrent replicas within the memory quota.
+              cpu: 100m # Leaves CPU limit capacity for replicas and the monitor.
+              memory: 64Mi # Fits concurrent replicas within the memory limit quota.
           readinessProbe:
             httpGet:
               path: /healthz # Excludes warming-up or unhealthy Pods from traffic.
