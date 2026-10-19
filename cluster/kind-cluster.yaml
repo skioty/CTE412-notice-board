@@ -1,0 +1,20 @@
+# Purpose: Create the three-node cluster for student 02230141.
+# Create: & "$HOME\kind.exe" create cluster --config cluster/kind-cluster.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: cte412-02230141 # Student number identifies this lab cluster.
+
+nodes:
+  - role: control-plane # One control-plane node manages the cluster.
+    image: kindest/node:v1.32.2 # Matches the installed kubectl minor version.
+    extraPortMappings:
+      - containerPort: 30090 # Matches the application Service's future NodePort.
+        hostPort: 30090 # Required host port for accessing the application.
+        listenAddress: "127.0.0.1" # Restricts host access to this laptop.
+        protocol: TCP # HTTP traffic uses TCP.
+
+  - role: worker # First worker runs application workloads.
+    image: kindest/node:v1.32.2 # Keeps all nodes on the same Kubernetes version.
+
+  - role: worker # Second worker meets the three-node lab requirement.
+    image: kindest/node:v1.32.2 # Keeps all nodes on the same Kubernetes version.

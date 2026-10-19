@@ -1,0 +1,16 @@
+# Purpose: Supply modest default container resources within the namespace quota.
+# Apply: kubectl apply -f manifests/base/limits.yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: notice-board-limits # Identifies the default resource policy.
+  namespace: nb-02230141 # Limits the policy to this student's namespace.
+spec:
+  limits:
+    - type: Container # Applies these defaults to individual containers.
+      defaultRequest:
+        cpu: 50m # Fifteen single-container Pods request 750m, below the 1-core quota.
+        memory: 32Mi # Fifteen such Pods request 480Mi, below the 1Gi quota.
+      default:
+        cpu: 100m # Fifteen such Pods total 1500m in limits, below the 2-core quota.
+        memory: 64Mi # Fifteen such Pods total 960Mi in limits, below the 2Gi quota.

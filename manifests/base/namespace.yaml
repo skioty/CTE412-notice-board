@@ -1,0 +1,11 @@
+# Purpose: Isolate the lab resources for student 02230141.
+# Apply: kubectl apply -f manifests/base/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nb-02230141 # Student-specific namespace required by the lab.
+  labels:
+    app.kubernetes.io/part-of: campus-notice-board # Groups this application's resources.
+    cte412/practical: "14" 
+  annotations:
+    cte412/student-name: "Pema Choden" 
