@@ -1,0 +1,48 @@
+# Purpose: Run three Notice Board replicas for student 02230141.
+# Apply: kubectl apply -f manifests/rolling/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notice-board # Required single-Deployment application name.
+  namespace: nb-02230141 # Isolates this student's application.
+  labels:
+    app: notice-board # Supports application-wide evidence queries.
+  annotations:
+    kubernetes.io/change-cause: "Task 3: deploy 02230141 version 1.0.0" # Records the baseline release.
+spec:
+  replicas: 3 # Required baseline replica count.
+  selector:
+    matchLabels:
+      app: notice-board # Stable selector remains unchanged across releases.
+  template:
+    metadata:
+      labels:
+        app: notice-board # Matches the Deployment and Service selectors.
+        version: "1.0.0" # Identifies the application version for observations.
+    spec:
+      containers:
+        - name: notice-board # Identifies the application container.
+          image: notice-board:02230141-1.0.0 # Locally built student-specific baseline.
+          imagePullPolicy: Never # Prevents any attempt to pull this image from a registry.
+          ports:
+            - name: http # Lets Services and probes reference the port by name.
+              containerPort: 8080 # Matches the application's listening port.
+          resources:
+            requests:
+              cpu: 50m # Seven app Pods plus one monitor fit within the 1-core request quota.
+              memory: 32Mi # Leaves memory request capacity for blue/green and surge Pods.
+            limits:
+              cpu: 100m # Seven app Pods plus one monitor fit within the 2-core limit quota.
+              memory: 64Mi # Leaves memory limit capacity for blue/green and surge Pods.
+          readinessProbe:
+            httpGet:
+              path: /healthz # Routes traffic only after warm-up and excludes the broken release.
+              port: http # Uses the named application port.
+            periodSeconds: 1 # Checks readiness frequently during the five-second warm-up.
+            failureThreshold: 1 # Removes an unhealthy Pod from ready endpoints after one failure.
+          livenessProbe:
+            httpGet:
+              path: /version # Checks responsiveness without restarting intentionally unhealthy releases.
+              port: http # Uses the named application port.
+            initialDelaySeconds: 5 # Gives the Python process time to start before liveness checks.
+            periodSeconds: 5 # Detects an unresponsive application without excessive probing.

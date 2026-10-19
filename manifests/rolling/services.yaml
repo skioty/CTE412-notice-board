@@ -1,0 +1,32 @@
+# Purpose: Expose Notice Board internally and through localhost port 30090.
+# Apply: kubectl apply -f manifests/rolling/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notice-board # Provides the internal DNS name used by the monitor.
+  namespace: nb-02230141 # Places the Service beside the application.
+spec:
+  type: ClusterIP
+  selector:
+    app: notice-board # Sends requests to ready application Pods.
+  ports:
+    - name: http # Identifies the Service's HTTP port.
+      port: 80 # Required internal Service port.
+      targetPort: http # Resolves to the container port named http, which is 8080.
+---
+# Purpose: Provide host access to Notice Board through the kind port mapping.
+# Apply: kubectl apply -f manifests/rolling/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notice-board-ext # Separates external access from the internal Service.
+  namespace: nb-02230141 # Places the Service beside the application.
+spec:
+  type: NodePort # Exposes the application on a port of the cluster nodes.
+  selector:
+    app: notice-board # Uses the same ready application Pods as the internal Service.
+  ports:
+    - name: http # Identifies the Service's HTTP port.
+      port: 80 # Exposes port 80 within the cluster.
+      targetPort: http # Forwards requests to the application's named port.
+      nodePort: 30090 # Matches the localhost mapping configured in Task 1.
