@@ -8,7 +8,7 @@ metadata:
   labels:
     app: notice-board # Supports application evidence queries.
   annotations:
-    kubernetes.io/change-cause: "Task 5: Recreate release 02230141 to 1.1.0" # Records this release.
+    kubernetes.io/change-cause: "Task 5: Reset 02230141 to 1.0.0 before rolling test" # Records baseline reset.
 spec:
   replicas: 3 # Required application replica count.
   strategy:
@@ -21,11 +21,11 @@ spec:
     metadata:
       labels:
         app: notice-board # Matches the Deployment and Services.
-        version: "1.1.0" # Identifies the new release.
+        version: "1.0.0" # Restore the baseline version.
     spec:
       containers:
         - name: notice-board # Identifies the application container.
-          image: notice-board:02230141-1.1.0 # Locally loaded new release.
+          image: notice-board:02230141-1.0.0 # Restores the baseline image.
           imagePullPolicy: Never # Prevents registry pulls.
           ports:
             - name: http # Named port used by Services and probes.
