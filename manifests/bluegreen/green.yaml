@@ -1,60 +1,68 @@
-# Purpose: Run the green release for student 02230141.
+# Purpose: Run the green release with ConfigMap-controlled pinned notices.
 # Apply: kubectl apply -f manifests/bluegreen/green.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notice-board-green # Identifies the green Deployment.
-  namespace: nb-02230141 # Isolates this student's resources.
+  namespace: nb-02230141 # Student-specific namespace.
   labels:
-    app: notice-board # Supports application evidence queries.
-    slot: green # Separates the green Deployment and its traffic.
+    app: notice-board # Groups application resources.
+    slot: green # Identifies this Deployment's colour.
   annotations:
-    kubernetes.io/change-cause: "Task 7: 02230141 green version 1.1.0" # Records this release.
+    kubernetes.io/change-cause: "Task 8: activate FEATURE_PINNED=true on green" # Documents configuration binding.
 spec:
-  replicas: 3 # Required application replica count.
+  replicas: 3 # Maintains three green replicas.
   strategy:
-    type: RollingUpdate # Replaces replicas gradually.
+    type: RollingUpdate # Replaces Pods gradually.
     rollingUpdate:
-      maxUnavailable: 0 # Keeps healthy replicas available while the new release is unready.
-      maxSurge: 1 # Allows one extra non-terminating replica during rollout.
-  minReadySeconds: 5 # Requires five seconds of readiness before counting a Pod as available.
-  progressDeadlineSeconds: 60 # Reports failure after 60 seconds without rollout progress.
+      maxUnavailable: 0 # Preserves available capacity during replacement.
+      maxSurge: 1 # Allows one extra non-terminating green replica.
+  minReadySeconds: 5 # Requires sustained readiness before removing an old replica.
+  progressDeadlineSeconds: 60 # Reports a rollout that stops progressing.
   selector:
     matchLabels:
-      app: notice-board # Stable selector across application versions.
-      slot: green # Separates the green Deployment and its traffic.
+      app: notice-board # Selects application Pods.
+      slot: green # Prevents overlap with the blue Deployment.
   template:
     metadata:
       labels:
-        app: notice-board # Matches the Deployment and Services.
-        slot: green # Separates the green Deployment and its traffic.
-        version: "1.1.0" # Identifies the restored healthy release.
+        app: notice-board # Matches the Service application selector.
+        slot: green # Matches green production or preview selection.
+        version: "1.1.0" # Keeps the existing image version.
+      annotations:
+        cte412/flags-revision: "2" # Changing this value triggers a declarative Pod replacement.
     spec:
       containers:
         - name: notice-board # Identifies the application container.
-          image: notice-board:02230141-1.1.0 # Matches the restored healthy release.
+          image: notice-board:02230141-1.1.0 # Reuses the existing image without rebuilding.
           imagePullPolicy: Never # Prevents registry pulls.
           ports:
-            - name: http # Named port used by Services and probes.
+            - name: http # Named port for Services and probes.
               containerPort: 8080 # Application listening port.
+          env:
+            - name: FEATURE_PINNED # Environment variable read by the application.
+              valueFrom:
+                configMapKeyRef:
+                  name: notice-board-flags # Reads the feature-flag ConfigMap.
+                  key: FEATURE_PINNED # Reads the pinned-ordering setting at container startup.
           resources:
             requests:
-              cpu: 50m # Leaves request capacity for replicas and the monitor.
-              memory: 32Mi # Fits concurrent replicas within the memory request quota.
+              cpu: 50m # Fits both colours, a surge Pod, and the monitor within quota.
+              memory: 32Mi # Leaves memory request capacity during rollout.
             limits:
-              cpu: 100m # Leaves CPU limit capacity for replicas and the monitor.
-              memory: 64Mi # Fits concurrent replicas within the memory limit quota.
+              cpu: 100m # Leaves CPU limit capacity during rollout.
+              memory: 64Mi # Leaves memory limit capacity during rollout.
           readinessProbe:
             httpGet:
-              path: /healthz # Prevents the broken release from receiving Service traffic.
+              path: /healthz # Excludes warming-up Pods from Service traffic.
               port: http # Uses the named application port.
-            periodSeconds: 1 # Checks readiness frequently.
-            failureThreshold: 1 # Removes readiness after one failed check.
+            periodSeconds: 1 # Detects readiness promptly.
+            failureThreshold: 1 # Removes readiness after one failure.
           livenessProbe:
             httpGet:
-              path: /version # Checks responsiveness without restarting the deliberately unhealthy release.
+              path: /version # Checks responsiveness independently of readiness.
               port: http # Uses the named application port.
-            initialDelaySeconds: 5 # Allows application startup before checking.
+            initialDelaySeconds: 5 # Allows application startup.
             periodSeconds: 5 # Checks responsiveness at a modest frequency.
 
 
