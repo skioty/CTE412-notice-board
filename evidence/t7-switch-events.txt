@@ -1,0 +1,8 @@
+Student: 02230141
+Combined capture start: 2026-10-19T12:58:35.609Z
+Switch 1 to green: apply started 2026-10-19T12:58:45.6285092Z
+Switch 1: apply returned 2026-10-19T12:58:46.0554697Z
+Switch 2 to blue: apply started 2026-10-19T12:59:11.5314478Z
+Switch 2: apply returned 2026-10-19T12:59:11.9690682Z
+Switch 3 to green: apply started 2026-10-19T12:59:37.1610931Z
+Switch 3: apply returned 2026-10-19T12:59:37.6929180Z

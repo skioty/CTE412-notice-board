@@ -1,0 +1,16 @@
+# Purpose: Inspect green independently of the production selection.
+# Apply: kubectl apply -f manifests/bluegreen/preview-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notice-board-preview # Provides a separate preview DNS name.
+  namespace: nb-02230141 # Student-specific namespace.
+spec:
+  type: ClusterIP
+  selector:
+    app: notice-board # Selects application Pods.
+    slot: green # Always routes preview traffic to green.
+  ports:
+    - name: http # Identifies the HTTP Service port.
+      port: 80 # Allows standard HTTP requests inside the cluster.
+      targetPort: http # Uses the named container port.

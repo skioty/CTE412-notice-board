@@ -1,0 +1,40 @@
+# Purpose: Route internal production traffic to the selected colour.
+# Apply: kubectl apply -f manifests/bluegreen/production-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notice-board # Preserves the DNS name used by the continuous monitor.
+  namespace: nb-02230141 # Student-specific namespace.
+  labels:
+    app: notice-board # Identifies the application resources.
+spec:
+  type: ClusterIP
+  selector:
+    app: notice-board # Selects application Pods.
+    slot: green # Routes production to green only.
+  ports:
+    - name: http # Identifies the HTTP Service port.
+      port: 80 # Required internal access port.
+      targetPort: http # Uses the named container port.
+---
+# Purpose: Route host production traffic to the same selected colour.
+# Apply: kubectl apply -f manifests/bluegreen/production-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notice-board-ext # Preserves the existing external Service.
+  namespace: nb-02230141 # Student-specific namespace.
+  labels:
+    app: notice-board # Identifies the application resources.
+spec:
+  type: NodePort # Exposes production through the kind host mapping.
+  selector:
+    app: notice-board # Selects application Pods.
+    slot: green # Routes production to green only.
+  ports:
+    - name: http # Identifies the HTTP Service port.
+      port: 80 # Internal Service port.
+      targetPort: http # Uses the named container port.
+      nodePort: 30090 # Matches the existing localhost mapping.
+
+

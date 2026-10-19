@@ -1,0 +1,142 @@
+Student: 02230141
+Production endpoints before first switch:
+apiVersion: v1
+items:
+- addressType: IPv4
+  apiVersion: discovery.k8s.io/v1
+  endpoints:
+  - addresses:
+    - 10.244.1.10
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+    nodeName: cte412-02230141-worker
+    targetRef:
+      kind: Pod
+      name: notice-board-blue-c4889c9cb-mjj6d
+      namespace: nb-02230141
+      uid: ac3ee8a2-4978-4d71-8954-c84e80f112ba
+  - addresses:
+    - 10.244.2.10
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+    nodeName: cte412-02230141-worker2
+    targetRef:
+      kind: Pod
+      name: notice-board-blue-c4889c9cb-nx2mh
+      namespace: nb-02230141
+      uid: 69b5e058-f702-45d1-b029-c46d58bd06db
+  - addresses:
+    - 10.244.2.9
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+    nodeName: cte412-02230141-worker2
+    targetRef:
+      kind: Pod
+      name: notice-board-blue-c4889c9cb-45sz8
+      namespace: nb-02230141
+      uid: 89ba69d1-e542-4160-ac01-33536c38dc8b
+  kind: EndpointSlice
+  metadata:
+    annotations:
+      endpoints.kubernetes.io/last-change-trigger-time: "2026-10-19T12:57:30Z"
+    creationTimestamp: "2026-10-19T11:52:41Z"
+    generateName: notice-board-
+    generation: 58
+    labels:
+      app: notice-board
+      endpointslice.kubernetes.io/managed-by: endpointslice-controller.k8s.io
+      kubernetes.io/service-name: notice-board
+    name: notice-board-j2n8q
+    namespace: nb-02230141
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Service
+      name: notice-board
+      uid: 76c31f0f-0c82-4e74-842a-c974aa7777ff
+    resourceVersion: "22778"
+    uid: c9d295cb-b014-4eb5-8070-461dea703abc
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+kind: List
+metadata:
+  resourceVersion: ""
+Preview endpoints before first switch:
+apiVersion: v1
+items:
+- addressType: IPv4
+  apiVersion: discovery.k8s.io/v1
+  endpoints:
+  - addresses:
+    - 10.244.1.12
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+    nodeName: cte412-02230141-worker
+    targetRef:
+      kind: Pod
+      name: notice-board-green-5dc768db8f-hb655
+      namespace: nb-02230141
+      uid: 85638ad8-91b4-4d32-9062-83f8463512a0
+  - addresses:
+    - 10.244.2.11
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+    nodeName: cte412-02230141-worker2
+    targetRef:
+      kind: Pod
+      name: notice-board-green-5dc768db8f-d7tpf
+      namespace: nb-02230141
+      uid: 0fe0efbe-2296-4bed-bbdb-b0a488a80d5f
+  - addresses:
+    - 10.244.1.11
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+    nodeName: cte412-02230141-worker
+    targetRef:
+      kind: Pod
+      name: notice-board-green-5dc768db8f-dlbn6
+      namespace: nb-02230141
+      uid: bb939215-58cc-417d-8dc8-b1323d73098b
+  kind: EndpointSlice
+  metadata:
+    annotations:
+      endpoints.kubernetes.io/last-change-trigger-time: "2026-10-19T12:57:30Z"
+    creationTimestamp: "2026-10-19T12:57:14Z"
+    generateName: notice-board-preview-
+    generation: 7
+    labels:
+      endpointslice.kubernetes.io/managed-by: endpointslice-controller.k8s.io
+      kubernetes.io/service-name: notice-board-preview
+    name: notice-board-preview-djgnx
+    namespace: nb-02230141
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Service
+      name: notice-board-preview
+      uid: 8e4c38db-24d7-4378-aa70-42ff3520835a
+    resourceVersion: "22783"
+    uid: d8392e4b-91d6-4f82-8beb-8922a800cbb0
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+kind: List
+metadata:
+  resourceVersion: ""
