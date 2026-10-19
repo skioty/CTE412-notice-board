@@ -1,0 +1,6 @@
+Student: 02230141
+NAME                            READY   STATUS    RESTARTS   AGE     IP           NODE                      NOMINATED NODE   READINESS GATES   VERSION
+notice-board-676df95d7b-g2dpn   1/1     Running   0          10m     10.244.1.7   cte412-02230141-worker    <none>           <none>            1.1.0
+notice-board-676df95d7b-jv66g   1/1     Running   0          10m     10.244.1.8   cte412-02230141-worker    <none>           <none>            1.1.0
+notice-board-676df95d7b-wmqx5   1/1     Running   0          10m     10.244.2.7   cte412-02230141-worker2   <none>           <none>            1.1.0
+notice-board-8cfc8bd44-cmhhg    0/1     Running   0          4m33s   10.244.1.9   cte412-02230141-worker    <none>           <none>            1.2.0-broken

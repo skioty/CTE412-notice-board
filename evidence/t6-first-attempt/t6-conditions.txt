@@ -1,0 +1,130 @@
+Student: 02230141
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "5",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{\"kubernetes.io/change-cause\":\"Task 6: release 02230141 to 1.2.0-broken\"},\"labels\":{\"app\":\"notice-board\"},\"name\":\"notice-board\",\"namespace\":\"nb-02230141\"},\"spec\":{\"minReadySeconds\":5,\"progressDeadlineSeconds\":60,\"replicas\":3,\"selector\":{\"matchLabels\":{\"app\":\"notice-board\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"notice-board\",\"version\":\"1.2.0-broken\"}},\"spec\":{\"containers\":[{\"image\":\"notice-board:02230141-1.2.0-broken\",\"imagePullPolicy\":\"Never\",\"livenessProbe\":{\"httpGet\":{\"path\":\"/version\",\"port\":\"http\"},\"initialDelaySeconds\":5,\"periodSeconds\":5},\"name\":\"notice-board\",\"ports\":[{\"containerPort\":8080,\"name\":\"http\"}],\"readinessProbe\":{\"failureThreshold\":1,\"httpGet\":{\"path\":\"/healthz\",\"port\":\"http\"},\"periodSeconds\":1},\"resources\":{\"limits\":{\"cpu\":\"100m\",\"memory\":\"64Mi\"},\"requests\":{\"cpu\":\"50m\",\"memory\":\"32Mi\"}}}]}}}}\n",
+            "kubernetes.io/change-cause": "Task 6: release 02230141 to 1.2.0-broken"
+        },
+        "creationTimestamp": "2026-10-19T11:52:31Z",
+        "generation": 5,
+        "labels": {
+            "app": "notice-board"
+        },
+        "name": "notice-board",
+        "namespace": "nb-02230141",
+        "resourceVersion": "21184",
+        "uid": "0a07fa20-5dca-4578-b4d5-4d9b4c757555"
+    },
+    "spec": {
+        "minReadySeconds": 5,
+        "progressDeadlineSeconds": 60,
+        "replicas": 3,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "notice-board"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "notice-board",
+                    "version": "1.2.0-broken"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "notice-board:02230141-1.2.0-broken",
+                        "imagePullPolicy": "Never",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/version",
+                                "port": "http",
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "notice-board",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 1,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": "http",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 1,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "100m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "50m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 3,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-19T12:30:52Z",
+                "lastUpdateTime": "2026-10-19T12:30:52Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-19T12:43:40Z",
+                "lastUpdateTime": "2026-10-19T12:43:40Z",
+                "message": "ReplicaSet \"notice-board-8cfc8bd44\" has timed out progressing.",
+                "reason": "ProgressDeadlineExceeded",
+                "status": "False",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 5,
+        "readyReplicas": 3,
+        "replicas": 4,
+        "unavailableReplicas": 1,
+        "updatedReplicas": 1
+    }
+}

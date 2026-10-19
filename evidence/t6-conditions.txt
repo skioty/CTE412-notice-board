@@ -1,0 +1,17 @@
+Student: 02230141
+
+
+type    : Available
+status  : True
+reason  : MinimumReplicasAvailable
+message : Deployment has minimum availability.
+
+type    : Progressing
+status  : False
+reason  : ProgressDeadlineExceeded
+message : ReplicaSet "notice-board-8cfc8bd44" has timed out 
+          progressing.
+
+
+
+
